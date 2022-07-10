@@ -94,3 +94,26 @@ flights[carrier == "AA", .N, by = origin]
 
 # How can we get the total number of trips for each origin, dest pair for 
 # carrier code "AA"?
+flights[carrier == "AA", .N, by = c("origin", "dest")]
+flights[carrier == "AA", .N, by = .(origin, dest)]
+
+# How can we get the average arrival and departure delay for each orig,dest pair 
+# for each month for carrier code "AA"?
+flights[
+  carrier == "AA", 
+  lapply(.SD, mean, na.rm = TRUE), .SDcols = c("arr_delay", "dep_delay"), 
+  by = .(origin, dest)
+]
+
+flights[
+  carrier == "AA", 
+  list(mean(arr_delay), mean(dep_delay)), 
+  by = list(origin, dest, month)
+]
+
+# To automatically order by the grouping variables use `keyby` instead of `by`:
+flights[
+  carrier == "AA", 
+  list(mean(arr_delay), mean(dep_delay)), 
+  keyby = list(origin, dest, month)
+]
